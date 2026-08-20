@@ -1,5 +1,5 @@
 import os
-# यह लाइन Protobuf को Python मोड में चलाती है (C++ वाली टक्कर खत्म)
+# सबसे पहली लाइन - यह Protobuf को Python मोड में चलाती है
 os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
 
 import streamlit as st
@@ -8,12 +8,10 @@ import numpy as np
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, RTCConfiguration
 import av
 
-# ---------- MEDIAPIPE को स्टैण्डर्ड तरीके से इम्पोर्ट करें ----------
-import mediapipe as mp
-
-# अब 'mp.solutions' पूरी तरह से उपलब्ध होगा (Python 3.11 + Protobuf 4.25.3 पर)
-mp_pose = mp.solutions.pose
-mp_drawing = mp.solutions.drawing_utils
+# ---------- मास्टर फिक्स: 'mp.solutions' को पूरी तरह बायपास करें ----------
+# यह सीधे MediaPipe के कोर Python मॉड्यूल को लोड करता है (बिना किसी C++ टक्कर के)
+from mediapipe.python.solutions import pose as mp_pose
+from mediapipe.python.solutions import drawing_utils as mp_drawing
 
 # ------------------ PAGE CONFIG ------------------
 st.set_page_config(page_title="AI Posture Coach - Physiotherapy", page_icon="🏋️", layout="centered")
@@ -49,6 +47,7 @@ def calculate_angle(a, b, c):
 # ------------------ VIDEO PROCESSOR CLASS (AI इंजन) ------------------
 class PoseProcessor(VideoTransformerBase):
     def __init__(self):
+        # अब हम सीधे mp_pose.Pose का इस्तेमाल कर रहे हैं (जो अब परिभाषित है)
         self.pose = mp_pose.Pose(min_detection_confidence=0.6, min_tracking_confidence=0.6)
 
     def transform(self, frame):
@@ -125,6 +124,7 @@ class PoseProcessor(VideoTransformerBase):
                 cv2.putText(img, feedback, (20, 150), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 3)
                 
+                # अब mp_drawing यहाँ उपलब्ध है
                 mp_drawing.draw_landmarks(img, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
             except Exception as e:
