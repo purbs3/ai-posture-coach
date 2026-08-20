@@ -27,6 +27,7 @@ with st.sidebar:
     st.info("💡 If the screen is black, restart the app or check your camera permissions.")
 
 # ------------------ MEDIAPIPE SETUP ------------------
+# इस लाइन को लाइन 28 पर लिखें
 mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
 pose = mp_pose.Pose(min_detection_confidence=0.6, min_tracking_confidence=0.6)
